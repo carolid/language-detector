@@ -7,13 +7,76 @@ class HelloHandler(RequestHandler):
     def set_default_headers(self):
         self.set_header("Content-Type", 'application/json')
 
+    def get_language(self, lang):
+
+        languages_dict = {
+            'af': 'Afrikaans',
+            'ar': 'Arabic',
+            'bn': 'Bengali',
+            'bg': 'Bulgarian',
+            'ca': 'Catalan',
+            'cs': 'Czech',
+            'cy': 'Welsh',
+            'da': 'Danish',
+            'de': 'German',
+            'el': 'Greek',
+            'en': 'English',
+            'es': 'Spanish',
+            'et': 'Estonian',
+            'fa': 'Persian',
+            'fi': 'Finnish',
+            'fr': 'French',
+            'gu': 'Gujarati',
+            'he': 'Hemodern',
+            'hi': 'Hindi',
+            'hr': 'Croatian',
+            'hu': 'Hungarian',
+            'id': 'Indonesian',
+            'it': 'Italian',
+            'ja': 'Japanese',
+            'kn': 'Kannada',
+            'ko': 'Korean',
+            'lt': 'Lithuanian',
+            'lv': 'Latvian',
+            'mk': 'Macedonian',
+            'ml': 'Malayalam',
+            'mr': 'MarMarāṭhī',
+            'ne': 'Nepali',
+            'nl': 'Dutch',
+            'no': 'Norwegian',
+            'pa': 'Punjabi',
+            'pl': 'Polish',
+            'pt': 'Portuguese',
+            'ro': 'Romanian',
+            'ru': 'Russian',
+            'sk': 'Slovak',
+            'sl': 'Slovene',
+            'so': 'Somali',
+            'sq': 'Albanian',
+            'sv': 'Swedish',
+            'sw': 'Swahili',
+            'ta': 'Tamil',
+            'te': 'Telugu',
+            'th': 'Thai',
+            'tl': 'Tagalog',
+            'tr': 'Turkish',
+            'uk': 'Ukrainian',
+            'ur': 'Urdu',
+            'vi': 'Vietnamese'
+        }
+
+        if lang in languages_dict:
+            return languages_dict[lang]
+
+
     def get(self):
-        self.write({'message': 'hello world'})
+        self.write({'message': 'Welcome to AnyLanguage - send a POST request to localhost:3000'})
 
     def post(self):
         value = self.get_argument('Raw')
         langDetect = detect(value)
-        self.write(langDetect)
+        pretty_lang = self.get_language(langDetect)
+        self.write(pretty_lang)
 
 
 def make_app():
