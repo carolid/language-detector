@@ -64,7 +64,7 @@ class LanguageDetector:
 
             if to_continue == "N":
                 self.set_continue()
-                print("Thank you for using AnyLanguage Detector! \n Goodbye.")
+                print("Thank you for using AnyLanguage Detector! \nGoodbye.")
 
     def language_detector(self):
         """
@@ -73,6 +73,8 @@ class LanguageDetector:
         """
         query_string = self.get_query_string()
         detect = requests.post(self._detector_url, data=query_string)
+        print(detect)
+        print(detect.content)
 
         return detect.text
 
