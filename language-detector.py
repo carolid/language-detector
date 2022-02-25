@@ -3,7 +3,7 @@ from tornado.web import Application, RequestHandler
 from tornado.ioloop import IOLoop
 
 
-class HelloHandler(RequestHandler):
+class DetectorHandler(RequestHandler):
     def set_default_headers(self):
         self.set_header("Content-Type", 'application/json')
 
@@ -68,24 +68,23 @@ class HelloHandler(RequestHandler):
         if lang in languages_dict:
             return languages_dict[lang]
 
-
     def get(self):
         self.write({'message': 'Welcome to AnyLanguage - send a POST request to localhost:3000'})
 
     def post(self):
-        value = self.get_argument('Raw')
+        value = self.get_argument('text')
         langDetect = detect(value)
         pretty_lang = self.get_language(langDetect)
         self.write(pretty_lang)
 
 
 def make_app():
-    urls = [("/", HelloHandler)]
+    urls = [("/", DetectorHandler)]
     return Application(urls)
 
 
 if __name__ == '__main__':
     app = make_app()
     app.listen(3000)
+    print("Language Detector microservice listening at 'http://localhost:3000' make a POST request to continue")
     IOLoop.instance().start()
-
