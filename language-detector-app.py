@@ -10,6 +10,7 @@ class LanguageDetector:
         self._query_string_text = None
         self._query_string_item = None
         self._continue = True
+        self._language = "Gibberish"
         self._detector_url = "http://localhost:3000/"
         self._translator_url = "http://localhost:4500/translate"
         self._scraper_url = "http://localhost:1400/"
@@ -37,6 +38,12 @@ class LanguageDetector:
 
     def set_continue(self):
         self._continue = False
+
+    def set_language(self, lang):
+        self._language = lang
+
+    def get_language(self):
+        return self._language
 
     def run_app(self):
         """
@@ -88,6 +95,7 @@ class LanguageDetector:
         """
         query_string = self.get_query_string_text()
         detect = requests.post(self._detector_url, data=query_string)
+        self.set_language(detect.text)
 
         return detect.text
 
@@ -108,11 +116,9 @@ class LanguageDetector:
         Nicholas' microservices
         :return: Returns a wikipedia blurb about the detected language
         """
-        query_string = self.get_query_string_item()
-        wiki_scrape = requests.post(self._scraper_url, data=query_string)
+        language_req = self.get_language()
+        wiki_scrape = requests.post(self._scraper_url, data={'item': str(language_req)})
         scraped = wiki_scrape.text
-        # scraped = json.loads(wiki_scrape.text)
-        # blurb = scraped['item']
 
         return scraped
 
