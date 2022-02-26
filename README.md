@@ -7,6 +7,7 @@ begin the application as an interactive console.
 ### If you just want to run the language detector microservice:
 - Clone this repo
 - `cd` to the project directory
+- Run `pip install -r requirements.txt` - this will install all the necessary imports
 - Run `python3 language-detector.py`, and send a POST request to `http://localhost:3000`, or change the port in the 
   detector code.
   
