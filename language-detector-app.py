@@ -2,6 +2,7 @@ from datetime import datetime
 import pytz
 import requests
 import json
+import time
 
 
 class LanguageDetector:
@@ -14,7 +15,7 @@ class LanguageDetector:
         self._detector_url = "http://localhost:3000/"
         self._translator_url = "http://localhost:4500/translate"
         self._scraper_url = "http://localhost:1400/"
-        self._latlon_url = "http://localhost:4500"
+        self._latlon_url = "http://localhost:4350/locate"
         self._geo_api_key = "AIzaSyCKa3w9Ee5Kyfdy8qeUX_j__6hsyqkpkXo"
         self._countries_dict = {
             "English": "Washington, DC",
@@ -59,7 +60,7 @@ class LanguageDetector:
             self.set_query_string_item({"item": str(raw_string)})
             language = self.language_detector()
 
-            print("The language was identified as " + language)
+            print("\n" + "The language was identified as " + language)
 
             if language == "English":
                 translate = input("Would you like to translate from English to Spanish? [Y/N] ")
@@ -67,21 +68,28 @@ class LanguageDetector:
                     word = self.language_translator()
 
                     if " " in word:
-                        print("Your phrase in Spanish is " + word)
+                        print("Your phrase in Spanish is " + word + "\n")
                     else:
-                        print("Your word in Spanish is " + word)
-                elif translate == "N":
-                    print("Ok! More info on the language you inputted: \n")
+                        print("Your word in Spanish is " + word + "\n")
+
+                time.sleep(1)
+                print("Where your language originated and the lat/lon of the capital: \n")
+
+                for _ in range(0, 3):
+                    print(".    ")
+                    time.sleep(0.5)
 
             if language in self._countries_dict:
                 print("The language you supplied originated in " + self._countries_dict[language])
-                time = self.timezone_calc()
-                print("The lat/lon there is: " + str(time))
+                latlon = self.timezone_calc()
+                print("The lat/lon there is: " + str(latlon) + "\n")
             else:
-                print("The language you supplied does not yet have a configured origin")
+                print("The language you supplied does not yet have a configured origin" + "\n")
 
-            wiki_blurb = self.wiki_scraper()
-            print("Here's some more information about " + language + "\n" + wiki_blurb)
+            scrape_q = input("Would you like to know more about the language you supplied? [Y/N] ")
+            if scrape_q == "Y":
+                wiki_blurb = self.wiki_scraper()
+                print("Here's some more information about " + language + "\n" + wiki_blurb + "\n")
 
             to_continue = input("Would you like to enter another word or phrase? [Y/N] ")
 
@@ -121,7 +129,11 @@ class LanguageDetector:
         wiki_scrape = requests.post(self._scraper_url, data={'item': str(language_req)})
         scraped = wiki_scrape.text
 
-        return scraped
+        if scraped == {"item": "None"}:
+            print("I'm sorry, your language could not be searched" + "\n")
+            return
+        else:
+            return scraped
 
     def timezone_calc(self):
         """
@@ -130,12 +142,7 @@ class LanguageDetector:
         """
         latlon_location = self._countries_dict[self._language]
         latlon = requests.post(self._latlon_url, json={'location': str(latlon_location)})
-        print({'location': str(latlon_location)})
         response = latlon.text
-        print(latlon.text)
-
-        # ETC = pytz.timezone('America/New_York')
-        # now = datetime.now(ETC)
 
         return response
 

@@ -73,6 +73,7 @@ class DetectorHandler(RequestHandler):
 
     def post(self):
         value = self.get_argument('text')
+        print("Message received is: " + self.get_argument('text'))
         langDetect = detect(value)
         pretty_lang = self.get_language(langDetect)
         self.write(pretty_lang)
