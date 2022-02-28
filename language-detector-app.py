@@ -14,13 +14,15 @@ class LanguageDetector:
         self._detector_url = "http://localhost:3000/"
         self._translator_url = "http://localhost:4500/translate"
         self._scraper_url = "http://localhost:1400/"
+        self._latlon_url = "http://localhost:4500"
+        self._geo_api_key = "AIzaSyCKa3w9Ee5Kyfdy8qeUX_j__6hsyqkpkXo"
         self._countries_dict = {
             "English": "Washington, DC",
             "Spanish": "Madrid, Spain",
             "French": "Paris, France",
             "Chinese": "Bejing, China",
             "Japanese": "Tokyo, Japan",
-            "Portuguese": "Lison, Portugal",
+            "Portuguese": "Lisbon, Portugal",
             "Russian": "Moscow, Russia"
         }
 
@@ -73,11 +75,10 @@ class LanguageDetector:
 
             if language in self._countries_dict:
                 print("The language you supplied originated in " + self._countries_dict[language])
+                time = self.timezone_calc()
+                print("The lat/lon there is: " + str(time))
             else:
                 print("The language you supplied does not yet have a configured origin")
-
-            time = self.timezone_calc()
-            print("The time there is: " + str(time))
 
             wiki_blurb = self.wiki_scraper()
             print("Here's some more information about " + language + "\n" + wiki_blurb)
@@ -127,10 +128,16 @@ class LanguageDetector:
         Placeholder for Guru's microservice
         :return: String of timezone information
         """
-        ETC = pytz.timezone('America/New_York')
-        now = datetime.now(ETC)
+        latlon_location = self._countries_dict[self._language]
+        latlon = requests.post(self._latlon_url, json={'location': str(latlon_location)})
+        print({'location': str(latlon_location)})
+        response = latlon.text
+        print(latlon.text)
 
-        return now
+        # ETC = pytz.timezone('America/New_York')
+        # now = datetime.now(ETC)
+
+        return response
 
 
 if __name__ == "__main__":
