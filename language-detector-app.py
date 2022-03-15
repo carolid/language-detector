@@ -58,44 +58,61 @@ class LanguageDetector:
 
             self.set_query_string_text({"text": str(raw_string)})
             self.set_query_string_item({"item": str(raw_string)})
-            language = self.language_detector()
 
+            language = self.language_detector()
             print("\n" + "The language was identified as " + language)
 
-            if language == "English":
-                translate = input("Would you like to translate from English to Spanish? [Y/N] ")
-                if translate == "Y":
-                    word = self.language_translator()
-
-                    if " " in word:
-                        print("Your phrase in Spanish is " + word + "\n")
-                    else:
-                        print("Your word in Spanish is " + word + "\n")
-
-                time.sleep(1)
-                print("Where your language originated and the lat/lon of the capital: \n")
-
-                for _ in range(0, 3):
-                    print(".    ")
-                    time.sleep(0.5)
-
-            if language in self._countries_dict:
-                print("The language you supplied originated in " + self._countries_dict[language])
-                latlon = self.timezone_calc()
-                print("The lat/lon there is: " + str(latlon) + "\n")
-            else:
-                print("The language you supplied does not yet have a configured origin" + "\n")
-
-            scrape_q = input("Would you like to know more about the language you supplied? [Y/N] ")
-            if scrape_q == "Y":
-                wiki_blurb = self.wiki_scraper()
-                print("Here's some more information about " + language + "\n" + wiki_blurb + "\n")
+            self.to_translate()
+            self.to_latlon()
+            self.to_scrape()
 
             to_continue = input("Would you like to enter another word or phrase? [Y/N] ")
 
             if to_continue == "N":
                 self.set_continue()
                 print("Thank you for using AnyLanguage Detector! \nGoodbye.")
+
+    def to_translate(self):
+        """
+        Function to determine if English to Spanish translation should occur
+        """
+        if self.get_language() == "English":
+            translate = input("Would you like to translate from English to Spanish? [Y/N] ")
+            if translate == "Y":
+                word = self.language_translator()
+
+                if " " in word:
+                    print("Your phrase in Spanish is " + word + "\n")
+                else:
+                    print("Your word in Spanish is " + word + "\n")
+
+            time.sleep(1)
+            print("Where your language originated and the lat/lon of the capital: \n")
+
+            for _ in range(0, 3):
+                print(".    ")
+                time.sleep(0.5)
+
+    def to_scrape(self):
+        """
+        Function to determine whether wiki scrape should be performed
+        """
+        scrape_q = input("Would you like to know more about the language you supplied? [Y/N] ")
+        if scrape_q == "Y":
+            wiki_blurb = self.wiki_scraper()
+            print("Here's some more information about " + self.get_language() + "\n" + wiki_blurb + "\n")
+
+    def to_latlon(self):
+        """
+        Function to determine the lat/lon of the country of origin
+        """
+        lang = self.get_language()
+        if lang in self._countries_dict:
+            print("The language you supplied originated in " + self._countries_dict[lang])
+            latlon = self.timezone_calc()
+            print("The lat/lon there is: " + str(latlon) + "\n")
+        else:
+            print("The language you supplied does not yet have a configured origin" + "\n")
 
     def language_detector(self):
         """
@@ -137,8 +154,8 @@ class LanguageDetector:
 
     def timezone_calc(self):
         """
-        Placeholder for Guru's microservice
-        :return: String of timezone information
+        Guru's microservice
+        :return: String of lat/lon information
         """
         latlon_location = self._countries_dict[self._language]
         latlon = requests.post(self._latlon_url, json={'location': str(latlon_location)})
